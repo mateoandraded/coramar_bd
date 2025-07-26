@@ -4,7 +4,7 @@ def conectar() :
     mydb = mysql.connector.connect(
         host="3.89.158.117",
         user="coramar_bd",
-        passwd="Adminroot12*",
+        passwd="Adinroot12*",
         database="coramar",
         port = "3306")
     return mydb
