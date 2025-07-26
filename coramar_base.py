@@ -26,3 +26,19 @@ def get_factura() :
     myresult = cursor.fetchall()
 
     return myresult
+
+def get_repartidores():
+    mydb = conectar()
+    cursor = mydb.cursor()
+
+    # Consulta para obtener la cantidad de asignaciones (repartos) por repartidor
+    cursor.execute("""
+                   SELECT E.Cedula, E.Primer_Nombre, E.Apellido, COUNT(A.Cod_Ruta) AS Total_Repartos
+                   FROM Empleado E
+                   LEFT JOIN Asignacion A ON E.Cedula = A.Repartidor
+                   GROUP BY E.Cedula ,E.Primer_Nombre, E.Apellido
+                   ORDER BY Total_Repartos DESC
+                   """)
+
+    myresult = cursor.fetchall()
+    return myresult
