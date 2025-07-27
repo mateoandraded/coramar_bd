@@ -20,6 +20,8 @@ def mostrar_facturas(facturas):
         print(
             f"| {factura[0]:<10} | {factura[1]:<11} | {factura[2]:<12} | {factura[3]:<8} | {factura[4]:<10} | {factura[5]:<15} | {factura[6]:<7} |")
     print("\n")
+
+
 def mostrar_repartidores(repartidores):
     print("\nRepartidores y Asignaciones:")
     print("| Cedula     | Primer Nombre | Apellido     | Total Repartos |")
@@ -66,5 +68,5 @@ def main():
             print("Opción no válida, intente nuevamente.")
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
