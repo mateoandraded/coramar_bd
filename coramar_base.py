@@ -230,3 +230,196 @@ def eliminar_cliente(cedula):
     cursor = mydb.cursor()
     cursor.execute("DELETE FROM Cliente WHERE Cedula=%s", (cedula,))
     mydb.commit()
+
+
+def insertar_tarifa(id_tarifa, valor_base, cliente, fecha):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("INSERT INTO Tarifa VALUES (%s, %s, %s, %s)", (id_tarifa, valor_base, cliente, fecha))
+    mydb.commit()
+
+def consultar_tarifas():
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Tarifa")
+    return cursor.fetchall()
+
+def actualizar_tarifa(id_tarifa, valor_base, cliente, fecha):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE Tarifa SET Valor_Base=%s, Cliente=%s, Fecha_Tarifa=%s WHERE ID_Tarifa=%s", (valor_base, cliente, fecha, id_tarifa))
+    mydb.commit()
+
+def eliminar_tarifa(id_tarifa):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("DELETE FROM Tarifa WHERE ID_Tarifa=%s", (id_tarifa,))
+    mydb.commit()
+
+def insertar_ruta(id_ruta, descripcion, estado, nombre):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("INSERT INTO Ruta VALUES (%s, %s, %s, %s)", (id_ruta, descripcion, estado, nombre))
+    mydb.commit()
+
+def consultar_rutas():
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Ruta")
+    return cursor.fetchall()
+
+def actualizar_ruta(id_ruta, descripcion, estado, nombre):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE Ruta SET Descripcion_Ruta=%s, Estado_Ruta=%s, Nombre_Ruta=%s WHERE ID_Ruta=%s", (descripcion, estado, nombre, id_ruta))
+    mydb.commit()
+
+def eliminar_ruta(id_ruta):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("DELETE FROM Ruta WHERE ID_Ruta=%s", (id_ruta,))
+    mydb.commit()
+
+def insertar_recorrido(cod_zona, cod_ruta, estado):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("INSERT INTO Recorrido VALUES (%s, %s, %s)", (cod_zona, cod_ruta, estado))
+    mydb.commit()
+
+def consultar_recorridos():
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Recorrido")
+    return cursor.fetchall()
+
+def actualizar_recorrido(cod_zona, cod_ruta, estado):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE Recorrido SET Estado_Rec=%s WHERE Cod_Zona=%s AND Cod_Ruta=%s", (estado, cod_zona, cod_ruta))
+    mydb.commit()
+
+def eliminar_recorrido(cod_zona, cod_ruta):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("DELETE FROM Recorrido WHERE Cod_Zona=%s AND Cod_Ruta=%s", (cod_zona, cod_ruta))
+    mydb.commit()
+
+def insertar_asignacion(cod_ruta, repartidor, estado, fecha, hora_inicio, hora_fin):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("INSERT INTO Asignacion VALUES (%s, %s, %s, %s, %s, %s)", (cod_ruta, repartidor, estado, fecha, hora_inicio, hora_fin))
+    mydb.commit()
+
+def consultar_asignaciones():
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Asignacion")
+    return cursor.fetchall()
+
+def actualizar_asignacion(cod_ruta, repartidor, estado, fecha, hora_inicio, hora_fin):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE Asignacion SET Estado_Asignacion=%s, Fecha_Asignacion=%s, Hora_Inicio=%s, Hora_Fin=%s WHERE Cod_Ruta=%s AND Repartidor=%s", (estado, fecha, hora_inicio, hora_fin, cod_ruta, repartidor))
+    mydb.commit()
+
+def eliminar_asignacion(cod_ruta, repartidor):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("DELETE FROM Asignacion WHERE Cod_Ruta=%s AND Repartidor=%s", (cod_ruta, repartidor))
+    mydb.commit()
+
+def insertar_factura(id_factura, fecha, monto, estado, tipo, saldo, observaciones, repartidor, cliente):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("INSERT INTO Factura VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (id_factura, fecha, monto, estado, tipo, saldo, observaciones, repartidor, cliente))
+    mydb.commit()
+
+def consultar_facturas():
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Factura")
+    return cursor.fetchall()
+
+def actualizar_factura(id_factura, fecha, monto, estado, tipo, saldo, observaciones, repartidor, cliente):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE Factura SET Fecha_Factura=%s, Monto_Total=%s, Estado=%s, Tipo_Venta=%s, Saldo_Pendiente=%s, Observaciones=%s, Repartidor=%s, Cliente=%s WHERE ID_Factura=%s", (fecha, monto, estado, tipo, saldo, observaciones, repartidor, cliente, id_factura))
+    mydb.commit()
+
+def eliminar_factura(id_factura):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("DELETE FROM Factura WHERE ID_Factura=%s", (id_factura,))
+    mydb.commit()
+
+def insertar_pago(num_pago, fecha, metodo, monto, cod_factura):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("INSERT INTO Pago VALUES (%s, %s, %s, %s, %s)", (num_pago, fecha, metodo, monto, cod_factura))
+    mydb.commit()
+
+def consultar_pagos():
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Pago")
+    return cursor.fetchall()
+
+def actualizar_pago(num_pago, fecha, metodo, monto, cod_factura):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE Pago SET Fecha_Pago=%s, Metodo=%s, Monto=%s, Cod_Factura=%s WHERE Numero_Pago=%s", (fecha, metodo, monto, cod_factura, num_pago))
+    mydb.commit()
+
+def eliminar_pago(num_pago):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("DELETE FROM Pago WHERE Numero_Pago=%s", (num_pago,))
+    mydb.commit()
+
+def insertar_detalle_factura(num_producto, cantidad, subtotal, cod_factura, cod_tarifa, cod_producto):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("INSERT INTO Detalle_Factura VALUES (%s, %s, %s, %s, %s, %s)", (num_producto, cantidad, subtotal, cod_factura, cod_tarifa, cod_producto))
+    mydb.commit()
+
+def consultar_detalles_factura():
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Detalle_Factura")
+    return cursor.fetchall()
+
+def actualizar_detalle_factura(num_producto, cantidad, subtotal, cod_factura, cod_tarifa, cod_producto):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE Detalle_Factura SET Cantidad=%s, Subtotal_Detalle=%s, Cod_Factura=%s, Cod_Tarifa=%s, Cod_Producto=%s WHERE Numero_de_producto=%s", (cantidad, subtotal, cod_factura, cod_tarifa, cod_producto, num_producto))
+    mydb.commit()
+
+def eliminar_detalle_factura(num_producto):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("DELETE FROM Detalle_Factura WHERE Numero_de_producto=%s", (num_producto,))
+    mydb.commit()
+
+def insertar_detalle_compra(id_compra, cantidad, estado_pago, metodo_pago, fecha_compra, fecha_pago_compra, subtotal, provedor, encargado, cod_producto):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("INSERT INTO Detalle_Compra VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id_compra, cantidad, estado_pago, metodo_pago, fecha_compra, fecha_pago_compra, subtotal, provedor, encargado, cod_producto))
+    mydb.commit()
+
+def consultar_detalles_compra():
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Detalle_Compra")
+    return cursor.fetchall()
+
+def actualizar_detalle_compra(id_compra, cantidad, estado_pago, metodo_pago, fecha_compra, fecha_pago_compra, subtotal, provedor, encargado, cod_producto):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("UPDATE Detalle_Compra SET Cantidad=%s, Estado_Pago=%s, Metodo_Pago=%s, Fecha_Compra=%s, Fecha_Pago_Compra=%s, Subtotal_Detalle=%s, Provedor=%s, Encargado=%s, Cod_Producto=%s WHERE ID_Compra=%s", (cantidad, estado_pago, metodo_pago, fecha_compra, fecha_pago_compra, subtotal, provedor, encargado, cod_producto, id_compra))
+    mydb.commit()
+
+def eliminar_detalle_compra(id_compra):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("DELETE FROM Detalle_Compra WHERE ID_Compra=%s", (id_compra,))
+    mydb.commit()
