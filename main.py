@@ -70,3 +70,55 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def menu_crud(nombre_tabla, insertar_func, consultar_func, actualizar_func, eliminar_func, campos_insertar, campos_actualizar, campos_eliminar, buscar_func=None):
+    while True:
+        print(f"\n--- {nombre_tabla} ---")
+        print("1. Insertar")
+        print("2. Consultar")
+        print("3. Actualizar")
+        print("4. Eliminar")
+        print("5. Volver al Menú Principal")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == "1":
+            datos = [input(f"Ingrese {campo}: ") for campo in campos_insertar]
+            insertar_func(*datos)
+            print(f"{nombre_tabla} insertado correctamente.")
+
+        elif opcion == "2":
+            if buscar_func:
+                print("\n1. Ver todos")
+                print("2. Buscar por nombre")
+                subop = input("Seleccione una opción: ")
+                if subop == "1":
+                    registros = consultar_func()
+                elif subop == "2":
+                    nombre = input("Ingrese nombre completo: ")
+                    registros = buscar_func(nombre)
+                else:
+                    print("Opción inválida.")
+                    continue
+            else:
+                registros = consultar_func()
+
+            if registros:
+                print(tabulate(registros, headers=campos_insertar, tablefmt="grid"))
+            else:
+                print("No hay registros.")
+
+        elif opcion == "3":
+            datos = [input(f"Ingrese {campo}: ") for campo in campos_actualizar]
+            actualizar_func(*datos)
+            print(f"{nombre_tabla} actualizado correctamente.")
+
+        elif opcion == "4":
+            datos = [input(f"Ingrese {campo}: ") for campo in campos_eliminar]
+            eliminar_func(*datos)
+            print(f"{nombre_tabla} eliminado correctamente.")
+
+        elif opcion == "5":
+            break
+        else:
+            print("Opción inválida.")
+
