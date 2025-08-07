@@ -2,7 +2,7 @@ import mysql.connector
 
 def conectar() :
     mydb = mysql.connector.connect(
-        host="54.145.65.73",
+        host="ec2-184-73-56-205.compute-1.amazonaws.com",
         user="coramar_bd",
         passwd="Adminroot12*",
         database="coramar",
