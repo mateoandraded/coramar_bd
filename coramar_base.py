@@ -423,3 +423,133 @@ def eliminar_detalle_compra(id_compra):
     cursor = mydb.cursor()
     cursor.execute("DELETE FROM Detalle_Compra WHERE ID_Compra=%s", (id_compra,))
     mydb.commit()
+
+
+def insertar_cliente_sp(cedula, nombre, apellido, telefono, categoria, direccion, cod_zona, cod_tarifa):
+    """Insertar cliente usando el stored procedure"""
+    mydb = conectar()
+    cursor = mydb.cursor()
+    try:
+        cursor.callproc('sp_insertar_cliente',
+                        (cedula, nombre, apellido, telefono, categoria, direccion, cod_zona, cod_tarifa))
+        mydb.commit()
+    except mysql.connector.Error as err:
+        print(f"Error al insertar cliente: {err}")
+
+
+def registrar_pago_sp(numero_pago, fecha_pago, metodo, monto, cod_factura):
+    """Registrar pago usando el stored procedure"""
+    mydb = conectar()
+    cursor = mydb.cursor()
+    try:
+        cursor.callproc('sp_registrar_pago',
+                        (numero_pago, fecha_pago, metodo, monto, cod_factura))
+        mydb.commit()
+        print("Pago registrado correctamente usando SP")
+    except mysql.connector.Error as err:
+        print(f"Error al registrar pago: {err}")
+
+
+def registrar_compra_sp(id_compra, cantidad, estado_pago, metodo_pago, fecha_compra,
+                        fecha_pago_compra, subtotal, proveedor, encargado, cod_producto):
+    """Registrar compra usando el stored procedure"""
+    mydb = conectar()
+    cursor = mydb.cursor()
+    try:
+        # Convertir estado_pago a booleano si es string
+        if isinstance(estado_pago, str):
+            estado_pago = estado_pago.lower() in ('true', '1', 'si', 'yes')
+
+        cursor.callproc('sp_registrar_compra',
+                        (id_compra, cantidad, estado_pago, metodo_pago, fecha_compra,
+                         fecha_pago_compra, subtotal, proveedor, encargado, cod_producto))
+        mydb.commit()
+        print("Compra registrada correctamente usando SP")
+    except mysql.connector.Error as err:
+        print(f"Error al registrar compra: {err}")
+
+
+def eliminar_cliente_por_nombre_sp(nombre, apellido):
+    """Eliminar cliente por nombre usando el stored procedure"""
+    mydb = conectar()
+    cursor = mydb.cursor()
+    try:
+        cursor.callproc('sp_eliminar_cliente_por_nombre', (nombre, apellido))
+        mydb.commit()
+        print("Cliente eliminado correctamente usando SP")
+    except mysql.connector.Error as err:
+        print(f"Error al eliminar cliente: {err}")
+
+
+def buscar_cliente_por_nombre_sp(nombre, apellido):
+    """Buscar cliente por nombre usando el stored procedure"""
+    mydb = conectar()
+    cursor = mydb.cursor()
+    try:
+        cursor.callproc('sp_buscar_cliente_por_nombre', (nombre, apellido))
+        result = []
+        for result_set in cursor.stored_results():
+            result.extend(result_set.fetchall())
+        return result
+    except mysql.connector.Error as err:
+        print(f"Error al buscar cliente: {err}")
+        return []
+
+
+def insertar_detalle_factura_sp(num_producto, cantidad, subtotal, cod_factura, cod_producto):
+    """Insertar detalle de factura usando el stored procedure"""
+    mydb = conectar()
+    cursor = mydb.cursor()
+    try:
+        cursor.callproc('sp_insertar_detalle_factura',
+                        (num_producto, cantidad, subtotal, cod_factura, cod_producto))
+        mydb.commit()
+        print("Detalle de factura insertado correctamente usando SP")
+    except mysql.connector.Error as err:
+        print(f"Error al insertar detalle de factura: {err}")
+
+
+
+def consultar_ventas_por_zona():
+    """Consultar vista de ventas por zona"""
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM vista_ventas_por_zona")
+    return cursor.fetchall()
+
+
+def consultar_deudas_por_zona():
+    """Consultar vista de deudas por zona"""
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM vista_deudas_por_zona")
+    return cursor.fetchall()
+
+
+def consultar_rendimiento_repartidores():
+    """Consultar vista de rendimiento de repartidores"""
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM vista_repartidor_rendimiento")
+    return cursor.fetchall()
+
+
+def consultar_inventario_critico():
+    """Consultar vista de inventario crítico"""
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM vista_inventario_critico")
+    return cursor.fetchall()
+
+def obtener_id_zona_por_nombre_sp(nombre_zona):
+
+    mydb = conectar()
+    cursor = mydb.cursor()
+    try:
+
+        args = [nombre_zona, None]
+        result_args = cursor.callproc('sp_obtener_id_zona', args)
+        return result_args[1]
+    except mysql.connector.Error as err:
+        print(f"Error al buscar zona: {err}")
+        return None
