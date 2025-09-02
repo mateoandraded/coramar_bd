@@ -452,11 +452,9 @@ def registrar_pago_sp(numero_pago, fecha_pago, metodo, monto, cod_factura):
 
 def registrar_compra_sp(id_compra, cantidad, estado_pago, metodo_pago, fecha_compra,
                         fecha_pago_compra, subtotal, proveedor, encargado, cod_producto):
-    """Registrar compra usando el stored procedure"""
     mydb = conectar()
     cursor = mydb.cursor()
     try:
-        # Convertir estado_pago a booleano si es string
         if isinstance(estado_pago, str):
             estado_pago = estado_pago.lower() in ('true', '1', 'si', 'yes')
 
@@ -464,7 +462,7 @@ def registrar_compra_sp(id_compra, cantidad, estado_pago, metodo_pago, fecha_com
                         (id_compra, cantidad, estado_pago, metodo_pago, fecha_compra,
                          fecha_pago_compra, subtotal, proveedor, encargado, cod_producto))
         mydb.commit()
-        print("Compra registrada correctamente usando SP")
+
     except mysql.connector.Error as err:
         print(f"Error al registrar compra: {err}")
 
@@ -476,7 +474,7 @@ def eliminar_cliente_por_nombre_sp(nombre, apellido):
     try:
         cursor.callproc('sp_eliminar_cliente_por_nombre', (nombre, apellido))
         mydb.commit()
-        print("Cliente eliminado correctamente usando SP")
+
     except mysql.connector.Error as err:
         print(f"Error al eliminar cliente: {err}")
 
@@ -553,3 +551,52 @@ def obtener_id_zona_por_nombre_sp(nombre_zona):
     except mysql.connector.Error as err:
         print(f"Error al buscar zona: {err}")
         return None
+
+def obtener_proveedores_activos():
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT RUC, Nombre_Proveedor FROM Proveedor WHERE Estado_Proveedor = 'Activo'")
+    return cursor.fetchall()
+
+def obtener_productos():
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT ID_Producto, Nombre_Producto, Precio_Base, Stock_Actual FROM Producto")
+    return cursor.fetchall()
+
+def obtener_precio_producto(cod_producto):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.execute("SELECT Precio_Base FROM Producto WHERE ID_Producto = %s", (cod_producto,))
+    result = cursor.fetchone()
+    return result[0] if result else 0
+
+
+def buscar_facturas_por_cliente(cedula):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    cursor.callproc('sp_buscar_facturas_por_cliente', (cedula,))
+    result = []
+    for result_set in cursor.stored_results():
+        result.extend(result_set.fetchall())
+    return result
+
+
+
+def registrar_venta(cedula_cliente, cod_producto, cantidad, cedula_repartidor, tipo_venta, observaciones):
+    mydb = conectar()
+    cursor = mydb.cursor()
+    args = [cedula_cliente, cod_producto, cantidad, cedula_repartidor, tipo_venta, observaciones, 0.0]
+    try:
+        cursor.callproc('sp_registrar_venta', args)
+        subtotal = args[6]
+        result = []
+        for result_set in cursor.stored_results():
+            result.extend(result_set.fetchall())
+        mydb.commit()
+        if result:
+            return result[0][0], subtotal
+    except Exception as e:
+        mydb.rollback()
+        raise e
+

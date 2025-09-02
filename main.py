@@ -130,9 +130,169 @@ def menu_reportes():
         else:
             print("Opción inválida, intente nuevamente.")
 
+def menu_gestion_compras():
+    while True:
+        print("\n=== GESTIÓN DE COMPRAS ===")
+        print("1. Registrar nueva compra a proveedor")
+        print("2. Ver historial de compras")
+        print("3. Volver al Menú Principal")
+
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == "1":
+            registrar_compra_interactivo()
+        elif opcion == "2":
+            registros = consultar_detalles_compra()
+            campos_insertar = [
+                "ID_Compra",
+                "Cantidad",
+                "Estado_Pago",
+                "Metodo_Pago",
+                "Fecha_Compra",
+                "Fecha_Pago_Compra",
+                "Subtotal_Detalle",
+                "Provedor",
+                "Encargado",
+                "Cod_Producto"
+            ]
+            print(tabulate(registros, headers=campos_insertar, tablefmt="grid"))
+        elif opcion == "3":
+            break
+        else:
+            print("Opción inválida")
+
+
+def registrar_compra_interactivo():
+    """Interfaz interactiva para registrar compras"""
+    print("\n--- REGISTRAR NUEVA COMPRA ---")
+
+    # Mostrar proveedores activos
+    print("\nProveedores disponibles:")
+    proveedores = obtener_proveedores_activos()
+    for p in proveedores:
+        print(f"{p[0]} - {p[1]}")
+
+    # Mostrar productos
+    print("\nProductos disponibles:")
+    productos = obtener_productos()
+    for prod in productos:
+        print(f"{prod[0]} - {prod[1]} - Precio: ${prod[2]} - Stock: {prod[3]}")
+
+    # Capturar datos
+    id_compra = input("\nIngrese ID de compra: ")
+    proveedor = input("Ingrese RUC del proveedor: ")
+    encargado = input("Ingrese cédula del encargado: ")
+    cod_producto = input("Ingrese código del producto: ")
+    cantidad = int(input("Ingrese cantidad: "))
+    metodo_pago = input("Método de pago (Efectivo/Transferencia/Tarjeta): ")
+    estado_pago = input("¿Pagado? (true/false): ").lower() in ('true', '1', 'si', 'yes')
+
+    # Calcular subtotal (aquí podrías obtener el precio del producto)
+    precio = obtener_precio_producto(cod_producto)
+    subtotal = precio * cantidad if precio else 0
+
+    # Fechas
+    fecha_compra = input("Fecha de compra (YYYY-MM-DD): ")
+    fecha_pago = input("Fecha de pago (YYYY-MM-DD) o dejar vacío: ")
+    fecha_pago = fecha_pago if fecha_pago else None
+
+    # Registrar compra
+    try:
+        registrar_compra_sp(id_compra, cantidad, estado_pago, metodo_pago,
+                            fecha_compra, fecha_pago, subtotal, proveedor,
+                            encargado, cod_producto)
+    except Exception as e:
+        print(f"Error al registrar compra: {e}")
+
+
+def menu_ventas_productos():
+    while True:
+        print("\n=== VENTA DE PRODUCTOS ===")
+        print("1. Consultar ventas")
+        print("2. Registrar venta")
+        print("3. Volver al Menú Principal")
+
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == "1":
+            menu_consultar_ventas()
+        elif opcion == "2":
+            registrar_venta_unificada()
+        elif opcion == "3":
+            break
+        else:
+            print("Opción inválida")
+
+
+def menu_consultar_ventas():
+    print("\n--- CONSULTAR VENTAS ---")
+    print("1. Buscar facturas por cliente")
+    print("2. Mostrar todas las facturas")
+
+    opcion = input("Seleccione una opción: ")
+
+    if opcion == "1":
+        cedula = input("Ingrese cédula del cliente: ")
+        facturas = buscar_facturas_por_cliente(cedula)
+        if facturas:
+            headers = ["ID Factura", "Fecha", "Monto Total", "Estado", "Tipo Venta", "Saldo Pend", "Repartidor",
+                       "Cliente", "Nombre"]
+            print(tabulate(facturas, headers=headers, tablefmt="grid"))
+        else:
+            print("No se encontraron facturas para este cliente.")
+    elif opcion == "2":
+        facturas = consultar_facturas()
+        if facturas:
+            headers = ["ID Factura", "Fecha", "Monto Total", "Estado", "Tipo Venta", "Saldo Pend", "Observaciones",
+                       "Repartidor", "Cliente"]
+            print(tabulate(facturas, headers=headers, tablefmt="grid"))
+        else:
+            print("No hay facturas registradas.")
+
+
+def registrar_venta_unificada():
+    print("\n--- REGISTRAR VENTA ---")
+
+    # Mostrar clientes
+    print("\nClientes disponibles:")
+    clientes = consultar_clientes()
+    for c in clientes:
+        print(f"{c[0]} - {c[1]} {c[2]}")
+
+    # Mostrar productos
+    print("\nProductos disponibles:")
+    productos = obtener_productos()
+    for p in productos:
+        print(f"{p[0]} - {p[1]} - Precio: ${p[2]} - Stock: {p[3]}")
+
+    # Mostrar repartidores
+    print("\nRepartidores disponibles:")
+    repartidores = consultar_empleados()
+    for r in repartidores:
+        if r[5] == 'Repartidor':  # Solo mostrar repartidores
+            print(f"{r[0]} - {r[1]} {r[2]}")
+
+    # Capturar datos
+    cedula_cliente = input("\nIngrese cédula del cliente: ")
+    cod_producto = input("Ingrese código del producto: ")
+    cantidad = int(input("Ingrese cantidad: "))
+    cedula_repartidor = input("Ingrese cédula del repartidor: ")
+    tipo_venta = input("Tipo de venta (Contado/Credito): ")
+    observaciones = input("Observaciones (opcional): ")
+    try:
+        factura_id, monto = registrar_venta(cedula_cliente, cod_producto, cantidad, cedula_repartidor, tipo_venta,
+                                            observaciones)
+        print("¡Venta registrada exitosamente!")
+        print(f"Factura: {factura_id}")
+        print(f"Monto: ${monto:.2f}")
+    except Exception as e:
+        print(f"Error al registrar venta: {e}")
+
+
+
+
 
 def main():
-    # Probar conexión al iniciar
     if not conectar():
         print("No se puede conectar a la base de datos. Saliendo...")
         return
@@ -148,18 +308,17 @@ def main():
         print("7. Rutas")
         print("8. Recorridos")
         print("9. Asignaciones")
-        print("10. Facturas")
+        print("10. Ventas de productos")
         print("11. Pagos")
-        print("12. Detalles de Factura")
-        print("13. Detalles de Compra")
-        print("14. Reportes")
-        print("15. Salir")
+        print("12. Compras de Stock")
+        print("13. Reportes")
+        print("14. Salir")
         opcion = input("Seleccione una opción: ")
 
         if opcion == "1":
             menu_crud("Zona", insertar_zona, consultar_zonas, actualizar_zona, eliminar_zona,
                       ["ID_Zona", "Nombre_Zona", "Cantidad_Clientes", "Estado_Zona"],
-                      ["ID_Zona", "Nombre_Zona", "Cantidad_Clientes", "Estado_Zona"],
+                      ["ID_Zona", "Nombre_Zona", "Cantidad_Clientes", "Estado_Zona ('Activo', 'Inactivo')"],
                       ["ID_Zona"], buscar_func=buscar_zona_por_nombre)
 
         elif opcion == "2":
@@ -174,11 +333,8 @@ def main():
                       ["ID_Producto", "Nombre_Producto", "Presentacion", "Stock_Actual", "Precio_Base", "Marca"],
                       ["ID_Producto"], buscar_func=buscar_producto_por_nombre)
 
-
         elif opcion == "4":
-
             menu_crud("Cliente", insertar_cliente, consultar_clientes, actualizar_cliente, eliminar_cliente,
-
                       ["Cedula", "Primer_Nombre", "Apellido", "Telefono", "Categoria", "Direccion", "Nombre_Zona",
                        "Cod_Tarifa"],
                       ["Cedula", "Primer_Nombre", "Apellido", "Telefono", "Categoria", "Estado_cliente", "Direccion",
@@ -219,12 +375,7 @@ def main():
                       ["Cod_Ruta", "Repartidor"])
 
         elif opcion == "10":
-            menu_crud("Factura", insertar_factura, consultar_facturas, actualizar_factura, eliminar_factura,
-                      ["ID_Factura", "Fecha_Factura", "Monto_Total", "Estado", "Tipo_Venta", "Saldo_Pendiente",
-                       "Observaciones", "Repartidor", "Cliente"],
-                      ["ID_Factura", "Fecha_Factura", "Monto_Total", "Estado", "Tipo_Venta", "Saldo_Pendiente",
-                       "Observaciones", "Repartidor", "Cliente"],
-                      ["ID_Factura"])
+            menu_ventas_productos()
 
         elif opcion == "11":
             menu_crud("Pago", insertar_pago, consultar_pagos, actualizar_pago, eliminar_pago,
@@ -232,28 +383,16 @@ def main():
                       ["Numero_Pago", "Fecha_Pago", "Metodo", "Monto", "Cod_Factura"],
                       ["Numero_Pago"], usar_sp=True)
 
+
         elif opcion == "12":
-            menu_crud("Detalle Factura", insertar_detalle_factura, consultar_detalles_factura,
-                      actualizar_detalle_factura, eliminar_detalle_factura,
-                      ["Numero_de_producto", "Cantidad", "Subtotal_Detalle", "Cod_Factura", "Cod_Tarifa",
-                       "Cod_Producto"],
-                      ["Numero_de_producto", "Cantidad", "Subtotal_Detalle", "Cod_Factura", "Cod_Tarifa",
-                       "Cod_Producto"],
-                      ["Numero_de_producto"], usar_sp=True)
+            menu_gestion_compras()
 
+        # OPCIÓN 15: REPORTES - antes era 14
         elif opcion == "13":
-            menu_crud("Detalle Compra", insertar_detalle_compra, consultar_detalles_compra, actualizar_detalle_compra,
-                      eliminar_detalle_compra,
-                      ["ID_Compra", "Cantidad", "Estado_Pago", "Metodo_Pago", "Fecha_Compra", "Fecha_Pago_Compra",
-                       "Subtotal_Detalle", "Provedor", "Encargado", "Cod_Producto"],
-                      ["ID_Compra", "Cantidad", "Estado_Pago", "Metodo_Pago", "Fecha_Compra", "Fecha_Pago_Compra",
-                       "Subtotal_Detalle", "Provedor", "Encargado", "Cod_Producto"],
-                      ["ID_Compra"], usar_sp=True)
-
-        elif opcion == "14":
             menu_reportes()
 
-        elif opcion == "15":
+        # OPCIÓN 16: SALIR - antes era 15
+        elif opcion == "14":
             print("Saliendo del sistema...")
             break
         else:
